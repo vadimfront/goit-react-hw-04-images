@@ -22,7 +22,7 @@ export default class ImageGallery extends Component {
     const { searchTerm, handlerLoader } = this.props;
     const { hitsToEnd } = this.state;
 
-    if (searchTerm.length && prevProps.searchTerm !== searchTerm) {
+    if (prevProps.searchTerm !== searchTerm) {
       const { hits, totalHits } = await fetchData(searchTerm, 1, handlerLoader);
       this.setState({
         imagesData: hits,
