@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { GalleryImage, GalleryLi } from './GalleryItem.styled';
+import { GalleryImage, GalleryLi } from './ImageGalleryItem.styled';
 import { AnimatePresence } from 'framer-motion';
 
-export const GalleryItem = ({ imagesOption, handleClick }) => {
+export const ImageGalleryItem = ({ imagesOption, handleClick }) => {
   const { id, webformatURL, tags } = imagesOption;
 
   return (
@@ -19,7 +19,7 @@ export const GalleryItem = ({ imagesOption, handleClick }) => {
   );
 };
 
-GalleryItem.propsTypes = {
+ImageGalleryItem.propsTypes = {
   imagesOption: PropTypes.object.isRequired,
   handleClick: PropTypes.func,
 };

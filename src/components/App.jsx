@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Header } from './Header/Header';
-import Gallery from './Gallery/Gallery';
+import ImageGallery from './ImageGallery/ImageGallery';
 import Modal from './Modal/Modal';
 import { AnimatePresence } from 'framer-motion';
 import { notify } from 'utils/helpers';
@@ -47,7 +47,7 @@ export default class App extends Component {
     return (
       <>
         <Header submitHandler={this.submitHandler} />
-        <Gallery
+        <ImageGallery
           searchTerm={searchTerm}
           handlerLoader={this.handlerLoader}
           modalToggle={this.modalToggle}

@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Section from 'components/Section/Section';
-import { GalleryItem } from 'components/GalleryList/GalleryItem';
+import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Loader } from 'components/Loader/Loader';
 import { Button } from 'components/Button/Button';
 import { Container } from 'components/Container/Container.styled';
-import { GalleryImage, GalleryWrap } from './Gallery.styled';
+import { GalleryImage, GalleryWrap } from './ImageGallery.styled';
 import { fetchData } from 'utils/apiHelpers';
 import { notify } from 'utils/helpers';
 
-export default class Gallery extends Component {
+export default class ImageGallery extends Component {
   state = {
     imagesData: [],
     activeImage: null,
@@ -92,7 +92,7 @@ export default class Gallery extends Component {
   }
 }
 
-Gallery.propTypes = {
+ImageGallery.propTypes = {
   searchTerm: PropTypes.string,
   modalToggle: PropTypes.func,
   setModalContent: PropTypes.func,
@@ -109,7 +109,7 @@ const View = ({ imagesData, handleClick }) => {
             ? imagesData.map(image => {
                 const { id } = image;
                 return (
-                  <GalleryItem
+                  <ImageGalleryItem
                     key={id}
                     imagesOption={image}
                     handleClick={e => handleClick(e, id)}
