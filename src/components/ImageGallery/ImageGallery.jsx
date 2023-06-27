@@ -20,17 +20,22 @@ export default class ImageGallery extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     const { searchTerm, handlerLoader } = this.props;
-    const { hitsToEnd } = this.state;
+    const { hitsToEnd, imagesData } = this.state;
 
     if (prevProps.searchTerm !== searchTerm) {
       const { hits, totalHits } = await fetchData(searchTerm, 1, handlerLoader);
+      if (!totalHits) notify(`No images found for ${searchTerm}`, 'info');
       this.setState({
         imagesData: hits,
         hitsToEnd: totalHits - 12,
         page: 1,
       });
     }
-    if (prevState.hitsToEnd !== hitsToEnd && hitsToEnd <= 0) {
+    if (
+      imagesData.length &&
+      prevState.hitsToEnd !== hitsToEnd &&
+      hitsToEnd <= 0
+    ) {
       notify('There are no images to load.', 'info');
     }
   }
