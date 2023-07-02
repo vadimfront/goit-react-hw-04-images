@@ -12,6 +12,12 @@ const Modal = ({ children }) => {
   const { isModalOpen, modalToggle } = useContext(CustomModalContext);
 
   useEffect(() => {
+    const handleKeyDown = e => {
+      if (e.code === 'Escape') {
+        modalToggle(e);
+      }
+    };
+
     document.body.style.overflow = 'hidden';
     window.addEventListener('keydown', handleKeyDown);
 
@@ -19,13 +25,7 @@ const Modal = ({ children }) => {
       document.body.style.overflow = 'auto';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isModalOpen]);
-
-  const handleKeyDown = e => {
-    if (e.code === 'Escape') {
-      modalToggle(e);
-    }
-  };
+  }, [isModalOpen, modalToggle]);
 
   const additionalStyles = `
       position: absolute;
