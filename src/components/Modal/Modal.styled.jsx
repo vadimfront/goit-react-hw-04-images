@@ -14,7 +14,7 @@ const Overlay = styled(motion.div)`
   background: rgba(0, 0, 0, 0.8);
   z-index: 999;
 `;
-const ModalContent = styled.div`
+const ModalContent = styled(motion.div)`
   padding: 0 15px;
   appearance: ${props => (props.isModalOpen ? 'auto' : 'none')};
   z-index: 1;

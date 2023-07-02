@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Section from 'components/Section/Section';
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
@@ -8,94 +8,74 @@ import { Container } from 'components/Container/Container.styled';
 import { GalleryImage, GalleryWrap } from './ImageGallery.styled';
 import { fetchData } from 'utils/apiHelpers';
 import { notify } from 'utils/helpers';
+import { CustomModalContext } from 'hooks/ContextModal';
 
-export default class ImageGallery extends Component {
-  state = {
-    imagesData: [],
-    activeImage: null,
-    imageIndex: 0,
-    hitsToEnd: 0,
-    page: 1,
-  };
+const ImageGallery = ({ searchTerm }) => {
+  const [imagesData, setImagesData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hitsToEnd, setHitsToEnd] = useState(0);
 
-  async componentDidUpdate(prevProps, prevState) {
-    const { searchTerm, handlerLoader } = this.props;
-    const { hitsToEnd, imagesData } = this.state;
+  const { initialModalContent, modalToggle } = useContext(CustomModalContext);
 
-    if (prevProps.searchTerm !== searchTerm) {
-      const { hits, totalHits } = await fetchData(searchTerm, 1, handlerLoader);
+  useEffect(() => {
+    setPage(1);
+
+    const getSearchData = async () => {
+      const { hits, totalHits } = await fetchData(searchTerm, 1, setIsLoading);
       if (!totalHits) notify(`No images found for ${searchTerm}`, 'info');
-      this.setState({
-        imagesData: hits,
-        hitsToEnd: totalHits - 12,
-        page: 1,
-      });
-    }
-    if (
-      imagesData.length &&
-      prevState.hitsToEnd !== hitsToEnd &&
-      hitsToEnd <= 0
-    ) {
-      notify('There are no images to load.', 'info');
-    }
-  }
+      setImagesData(hits);
+      const hitsToEnd = totalHits - hits.length;
+      setHitsToEnd(hitsToEnd);
+    };
 
-  loadMore = async () => {
-    const { page } = this.state;
-    const { searchTerm, handlerLoader } = this.props;
-    const { hits } = await fetchData(searchTerm, page + 1, handlerLoader);
+    if (searchTerm.length) getSearchData();
+  }, [searchTerm]);
 
-    this.setState(prevState => ({
-      imagesData: [...prevState.imagesData, ...hits],
-      hitsToEnd: prevState.hitsToEnd - 12,
-      page: prevState.page + 1,
-    }));
+  useEffect(() => {
+    if (page > 1) {
+      const fetchLoadMore = async () => {
+        const { hits } = await fetchData(searchTerm, page, setIsLoading);
+        setImagesData(prevState => [...prevState, ...hits]);
+      };
+      fetchLoadMore();
+      if (hitsToEnd <= 0) notify('There are no images to load.', 'info');
+    }
+  }, [page, searchTerm, hitsToEnd]);
+
+  const loadMore = async () => {
+    setPage(prevPage => prevPage + 1);
+    setHitsToEnd(prevPage => prevPage - 12);
   };
 
-  selectActiveImage = id => {
-    const activeImageIndex = this.state.imagesData.findIndex(
-      image => image.id === id
+  const selectActiveImage = itemId => {
+    const activeImageIndex = imagesData.findIndex(image => image.id === itemId);
+
+    const { largeImageURL, tags } = imagesData[activeImageIndex];
+    initialModalContent(
+      <GalleryImage key={itemId} src={largeImageURL} alt={tags} />
     );
-    this.setState({
-      imageIndex: activeImageIndex,
-    });
-    return this.initialImageToShow(activeImageIndex);
   };
 
-  initialImageToShow = index => {
-    const { largeImageURL, tags } = this.state.imagesData[index];
-    return <GalleryImage key={index} src={largeImageURL} alt={tags} />;
-  };
-
-  handleClick = (e, id) => {
-    const { setModalContent, modalToggle } = this.props;
-    const markup = this.selectActiveImage(id);
-    setModalContent(markup);
+  const handleClick = (e, id) => {
+    selectActiveImage(id);
     modalToggle(e);
   };
 
-  render() {
-    const { imagesData, hitsToEnd } = this.state;
-    const { isLoading } = this.props;
+  return (
+    <>
+      {isLoading && <Loader />}
+      {!(isLoading && !imagesData.length) && (
+        <View imagesData={imagesData} handleClick={handleClick} />
+      )}
+      {!isLoading && hitsToEnd > 0 && (
+        <Button handleClick={loadMore}>Load More</Button>
+      )}
+    </>
+  );
+};
 
-    const loader = isLoading ? <Loader /> : null;
-    const content = !(isLoading && !imagesData.length) ? (
-      <View imagesData={imagesData} handleClick={this.handleClick} />
-    ) : null;
-    const btnLoadMore =
-      !isLoading && hitsToEnd > 0 ? (
-        <Button handleClick={this.loadMore}>Load More</Button>
-      ) : null;
-
-    return (
-      <>
-        {loader}
-        {content}
-        {btnLoadMore}
-      </>
-    );
-  }
-}
+export default ImageGallery;
 
 ImageGallery.propTypes = {
   searchTerm: PropTypes.string,

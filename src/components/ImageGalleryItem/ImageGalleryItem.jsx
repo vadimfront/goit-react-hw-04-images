@@ -8,7 +8,12 @@ export const ImageGalleryItem = ({ imagesOption, handleClick }) => {
 
   return (
     <AnimatePresence>
-      <GalleryLi key={id} initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
+      <GalleryLi
+        key={id}
+        initial={{ scale: 0.5 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 0.4 }}
+      >
         <GalleryImage
           src={webformatURL}
           alt={tags}
